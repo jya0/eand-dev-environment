@@ -31,15 +31,17 @@ FROM python:3.10.16-bookworm AS python_build
 FROM base
 COPY --from=python_build /usr/local /usr/local
 
-# ###### Set Python as default
-# ENV PATH="/usr/local/bin:${PATH}"
-
-# ###### Verify Python installation
-# RUN python3 --version
+######
 
 ###### Installation of additional Python Libraries
 COPY ./requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
+
+### Environment configuration
+###### Source envs for OCAML
+# RUN <<EOF
+# echo 'eval $(opam env)' >> /root/.zshrc
+# EOF
 
 ### Metadata
 LABEL \
