@@ -31,11 +31,23 @@ FROM python:3.10.16-bookworm AS python_build
 FROM base
 COPY --from=python_build /usr/local /usr/local
 
-######
-
 ###### Installation of additional Python Libraries
 COPY ./requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
+
+### Jupyter INSTALLATION using jupyter/base-notebook
+FROM jupyter/base-notebook AS jupyter_build
+
+### Copy Jupyter setup from the jupyter image
+FROM base
+COPY --from=jupyter_build /opt/conda /opt/conda
+
+### Set up Conda and Jupyter environment paths
+RUN <<EOF
+echo 'export PATH=/opt/conda/bin:${PATH}' >> /root/.zshrc
+# echo 'jupyter notebook --ip=0.0.0.0 --no-browser --allow-root' >> /root/.zshrc
+EOF
+
 
 ### Environment configuration
 ###### Source envs for OCAML
