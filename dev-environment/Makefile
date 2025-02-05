@@ -6,7 +6,7 @@
 #    By: jyao <jyao@student.42abudhabi.ae>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/10 10:29:56 by jyao              #+#    #+#              #
-#    Updated: 2025/02/05 09:10:33 by jyao             ###   ########.fr        #
+#    Updated: 2025/02/05 09:30:47 by jyao             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -72,3 +72,10 @@ clean:
 
 fclean: clean
 	docker rmi -f $(IMAGE_NAME)
+
+
+
+
+
+### USEFUL COMMANDS
+# docker system prune -a --volumes -f
