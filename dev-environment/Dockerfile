@@ -45,7 +45,7 @@ COPY --from=jupyter_build /opt/conda /opt/conda
 ### Set up Conda and Jupyter environment paths
 RUN <<EOF
 echo 'export PATH=/opt/conda/bin:${PATH}' >> /root/.zshrc
-# echo 'jupyter notebook --ip=0.0.0.0 --no-browser --allow-root' >> /root/.zshrc
+echo 'jupyter notebook --ip=0.0.0.0 --no-browser --allow-root &' >> /root/.zshrc
 EOF
 
 
