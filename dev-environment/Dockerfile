@@ -24,36 +24,43 @@ bash -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/i
 echo 'PROMPT=%B%F{blue}[DOCKER]%f%b$PROMPT' >> /root/.zshrc
 EOF
 
-### PYTHON 3.10 INSTALLATION using official Python 3.10.16 image
+#######################################
+### Stage 2: Import Python Installation
+#######################################
 FROM python:3.10.16-bookworm AS python_build
+# This image provides a full Python 3.10 environment.
+# (We’ll copy its /usr/local directory to get the installed Python binaries and libraries.)
 
-###### Copy Python from the Python image to the base Ubuntu image
-FROM base
+#########################################
+### Stage 3: Import Jupyter/Conda Setup
+#########################################
+FROM jupyter/base-notebook AS jupyter_build
+# This image is pre-configured with a Conda environment in /opt/conda
+# and comes with Jupyter preinstalled.
+
+#########################################
+### Stage 4: Final Image Assembly
+#########################################
+FROM base AS final
+
+# --- Copy Python from python_build ---
 COPY --from=python_build /usr/local /usr/local
+ENV PATH="/usr/local/bin:${PATH}"
 
-###### Installation of additional Python Libraries
-COPY ./requirements.txt /tmp/requirements.txt
+# --- Copy Conda/Jupyter from jupyter_build ---
+COPY --from=jupyter_build /opt/conda /opt/conda
+ENV PATH="/opt/conda/bin:${PATH}"
+
+##########################################################
+### Section: Install Additional Python Libraries via Pip
+##########################################################
+COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
-### Jupyter INSTALLATION using jupyter/base-notebook
-FROM jupyter/base-notebook AS jupyter_build
-
-### Copy Jupyter setup from the jupyter image
-FROM base
-COPY --from=jupyter_build /opt/conda /opt/conda
-
-### Set up Conda and Jupyter environment paths
+# Set up auto run commands during ZSH launch
 RUN <<EOF
-echo 'export PATH=/opt/conda/bin:${PATH}' >> /root/.zshrc
 echo 'jupyter notebook --ip=0.0.0.0 --no-browser --allow-root &' >> /root/.zshrc
 EOF
-
-
-### Environment configuration
-###### Source envs for OCAML
-# RUN <<EOF
-# echo 'eval $(opam env)' >> /root/.zshrc
-# EOF
 
 ### Metadata
 LABEL \
